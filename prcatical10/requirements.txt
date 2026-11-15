@@ -1,0 +1,64 @@
+
+kafka-python
+clickhouse-connect
+
+
+docker --version
+docker compose version
+docker compose up -d --build
+docker compose ps
+docker compose logs -f producer
+docker compose logs -f consumer
+docker compose exec clickhouse clickhouse-client --query "SELECT * FROM default.air_quality LIMIT 10"
+docker compose up -d
+docker compose up --build -d
+docker compose ps
+docker ps
+localhost:3000,deflau ,delfault
+dasboard
+SELECT
+    event_time,
+    city,
+    pm25,
+    pm10,
+    temperature
+FROM default.air_quality
+ORDER BY event_time
+docker compose down
+connection,datasourec new,clickhouse,8123  clickhouse  deafult
+dashobuard new ,add visulization
+SELECT
+    event_time,
+    city,
+    pm25,
+    pm10,
+    temperature
+FROM default.air_quality
+ORDER BY event_time
+table slect
+SELECT
+    event_time AS time,
+    pm25
+FROM default.air_quality
+ORDER BY time
+SELECT
+    event_time AS time,
+    pm10
+FROM default.air_quality
+ORDER BY time
+SELECT
+    event_time AS time,
+    temperature
+FROM default.air_quality
+ORDER BY time
+M2.5 → Time series
+
+
+
+PM10 → Time series
+
+
+
+Temperature → Time series
+apply,save dassh
+docker compose exec clickhouse clickhouse-client --user default --password practical10 --query "SELECT event_time, city, pm25, pm10, temperature FROM default.air_quality ORDER BY event_time DESC LIMIT 10"

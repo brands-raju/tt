@@ -1,0 +1,5 @@
+mvn clean compile
+mvn clean package
+java -jar target/flink-practical-1.0-SNAPSHOT.jar
+in set env path MAVEN_HOME,C:\Users\Vicky\Downloads\apache-maven-3.10.0-bin\apache-maven-3.10.0
+in path edit in username add %MAVEN_HOME%\bin

@@ -1,0 +1,71 @@
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: trino_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: university
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  minio:
+    image: pgsty/silo:latest
+    container_name: trino_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  minio-init:
+    image: pgsty/mc:latest
+    container_name: trino_minio_init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 admin password123; do
+        sleep 2;
+      done;
+      mc mb --ignore-existing local/warehouse;
+      "
+
+  
+  iceberg-rest:
+    image: tabulario/iceberg-rest:1.6.0
+    container_name: iceberg_rest
+    ports:
+      - "8181:8181"
+    environment:
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: password123
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      CATALOG_WAREHOUSE: s3://warehouse/
+      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT: http://minio:9000
+      CATALOG_S3_ACCESS_KEY_ID: admin
+      CATALOG_S3_SECRET_ACCESS_KEY: password123
+      CATALOG_S3_PATH__STYLE__ACCESS: "true"
+    depends_on:
+      - minio
+      - minio-init
+
+
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino_coordinator
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./etc/catalog:/etc/trino/catalog
+      - ./etc/config.properties:/etc/trino/config.properties
+    depends_on:
+      - mysql
+      - iceberg-rest
